@@ -2,8 +2,8 @@
   "name": "@enigmatis/polaris-middlewares",
   "version": "0.0.1",
   "description": "handling middlewares in polaris",
-  "main": "dist/src/main.js",
-  "types": "dist/src/main.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.json",
     "test": "mocha -r ts-node/register test/**/*.test.ts",
