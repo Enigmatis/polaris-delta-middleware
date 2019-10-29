@@ -57,6 +57,7 @@
   },
   "homepage": "https://github.com/Enigmatis/polaris-middlewares#readme",
   "dependencies": {
+    "@enigmatis/polaris-common": "^1.0.1",
     "@types/sinon": "^7.0.13",
     "@types/sinon-chai": "^3.2.3",
     "apollo-server-plugin-base": "^0.6.4",
