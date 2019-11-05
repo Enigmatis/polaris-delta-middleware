@@ -29,7 +29,8 @@ export class ExtensionsListener implements GraphQLRequestListener {
         !response.extensions ? response.extensions = {} : {};
 
         if (context.dataVersion) {
-            context.irrelevantEntities ? response.extensions.irrelevantEntities = context.irrelevantEntities : {};
+
+            context.res.locals.irrelevantEntities ? response.extensions.irrelevantEntities = context.res.locals.irrelevantEntities : {};
         }
 
         if (context.globalDataVersion) {
