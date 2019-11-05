@@ -1,5 +1,5 @@
-import {GraphQLRequestListener} from 'apollo-server-plugin-base';
-import {PolarisBaseContext} from '@enigmatis/polaris-common';
+import { GraphQLRequestListener } from 'apollo-server-plugin-base';
+import { PolarisBaseContext } from '@enigmatis/polaris-common';
 
 export class ExtensionsListener implements GraphQLRequestListener {
     private readonly dataVersionRepository: any;
@@ -16,7 +16,7 @@ export class ExtensionsListener implements GraphQLRequestListener {
             response,
         }: { context: PolarisBaseContext; response: any } = requestContext;
         if (context.logger) {
-            context.logger.debug('Data Version extension started instrumenting', {context});
+            context.logger.debug('Data Version extension started instrumenting', { context });
         }
         if (!response.extensions) {
             response.extensions = {};
@@ -46,7 +46,7 @@ export class ExtensionsListener implements GraphQLRequestListener {
                     if (context.logger) {
                         context.logger.error('Error fetching data version for extensions', {
                             context,
-                            graphqlLogProperties: {throwable: err},
+                            graphqlLogProperties: { throwable: err },
                         });
                     }
                 }
