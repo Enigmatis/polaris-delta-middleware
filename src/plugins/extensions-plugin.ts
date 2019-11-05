@@ -1,4 +1,8 @@
-import { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from 'apollo-server-plugin-base';
+import {
+    ApolloServerPlugin,
+    GraphQLRequestContext,
+    GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
 import { ExtensionsListener } from '..';
 
 export class ExtensionsPlugin implements ApolloServerPlugin {
