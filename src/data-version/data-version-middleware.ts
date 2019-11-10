@@ -1,25 +1,22 @@
-import { PolarisBaseContext } from '@enigmatis/polaris-common';
-
-const dataVersionHeaderName: string = 'data-version';
+import { DATA_VERSION, PolarisGraphQLContext } from '@enigmatis/polaris-common';
 
 const dataVersionMiddleware = async (
     resolve: any,
     root: any,
     args: any,
-    context: PolarisBaseContext,
+    context: PolarisGraphQLContext,
     info: any,
 ) => {
-    if (context.logger) {
-        context.logger.debug('Data version middleware started job', { context });
-    }
+    // if (context.logger) {
+    //     context.logger.debug('Data version middleware started job', { context });
+    // }
     const result = await resolve(root, args, context, info);
     let finalResult;
-    if (!root && context.dataVersion && !isNaN(context.dataVersion)) {
-        // assert that it has no root (so it is the root)
+    if (!root && context.requestHeaders.dataVersion && !isNaN(context.requestHeaders.dataVersion)) {
         if (result instanceof Array) {
             finalResult = result.filter(entity =>
-                entity.dataVersion && context.dataVersion
-                    ? entity.dataVersion > context.dataVersion
+                entity.dataVersion && context.requestHeaders.dataVersion
+                    ? entity.dataVersion > context.requestHeaders.dataVersion
                     : entity,
             );
         } else {
@@ -28,15 +25,15 @@ const dataVersionMiddleware = async (
     } else {
         finalResult = result;
     }
-    if (context.logger) {
-        context.logger.debug('Data version middleware finished job', { context });
-    }
+    // if (context.logger) {
+    //     context.logger.debug('Data version middleware finished job', { context });
+    // }
     return finalResult;
 };
 
 const initContextForDataVersion = async ({ req }: any) => {
     return {
-        dataVersion: req.headers[dataVersionHeaderName],
+        dataVersion: req.headers[DATA_VERSION],
     };
 };
 

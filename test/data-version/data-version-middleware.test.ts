@@ -1,12 +1,13 @@
 import { dataVersionMiddleware } from '../../src';
-import { PolarisBaseContext } from '@enigmatis/polaris-common';
+import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
+import { getContextWithRequestHeaders } from '../context-util';
 
 describe('data version middleware', () => {
     describe('root resolver', () => {
         it('should filter out entities with' + ' data version lower/equal to context', async () => {
             const root = undefined;
             const args = {};
-            const context: PolarisBaseContext = { dataVersion: 2 };
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 2 });
             const info = {};
             const objects = [{ title: 'moshe', dataVersion: 2 }, { title: 'dani', dataVersion: 5 }];
             const resolve = async () => {
@@ -17,7 +18,7 @@ describe('data version middleware', () => {
             expect(result).toEqual([{ title: 'dani', dataVersion: 5 }]);
         });
         it('no data version in context, root query, no filter should be applied', async () => {
-            const context: PolarisBaseContext = {};
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
             const objects = [{ title: 'moshe', dataVersion: 2 }, { title: 'dani', dataVersion: 5 }];
             const resolve = async () => {
                 return objects;
@@ -27,7 +28,9 @@ describe('data version middleware', () => {
             expect(result).toEqual(objects);
         });
         it('context data version is not a number, no filter should be applied', async () => {
-            const context: PolarisBaseContext = { dataVersion: undefined };
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({
+                dataVersion: undefined,
+            });
             const objects = [{ title: 'moshe', dataVersion: 2 }, { title: 'dani', dataVersion: 5 }];
             const resolve = async () => {
                 return objects;
@@ -37,7 +40,7 @@ describe('data version middleware', () => {
             expect(result).toEqual(objects);
         });
         it('entities does not have a data version property, no filter should be applied', async () => {
-            const context: PolarisBaseContext = { dataVersion: 3 };
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
             const objects = [{ title: 'moshe' }, { title: 'dani' }];
             const resolve = async () => {
                 return objects;
@@ -47,7 +50,7 @@ describe('data version middleware', () => {
             expect(result).toEqual(objects);
         });
         it('a single entity is resolved, no filter should be applied', async () => {
-            const context: PolarisBaseContext = { dataVersion: 3 };
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
             const objects = { title: 'moshe', dataVersion: 2 };
             const resolve = async () => {
                 return objects;
@@ -59,7 +62,7 @@ describe('data version middleware', () => {
     });
     describe('not a root resolver', () => {
         it('not a root resolver, no filter should be applied', async () => {
-            const context: PolarisBaseContext = { dataVersion: 3 };
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
             const objects = [{ title: 'moshe', dataVersion: 2 }, { title: 'dani', dataVersion: 5 }];
             const resolve = async () => {
                 return objects;

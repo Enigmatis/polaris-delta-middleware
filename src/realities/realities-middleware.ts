@@ -1,17 +1,19 @@
-import { PolarisBaseContext } from '@enigmatis/polaris-common';
+import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 
 const realitiesMiddleware = async (
     resolve: any,
     root: any,
     args: any,
-    context: PolarisBaseContext,
+    context: PolarisGraphQLContext,
     info: any,
 ) => {
     const result = await resolve(root, args, context, info);
     const operationalRealityId: number = 0;
-    context.realityId = context.realityId ? context.realityId : 0;
+    context.requestHeaders.realityId = context.requestHeaders.realityId
+        ? context.requestHeaders.realityId
+        : 0;
     const noRealityIdOrSameAsHeader = (entity: any) =>
-        entity.realityId === undefined || entity.realityId === context.realityId;
+        entity.realityId === undefined || entity.realityId === context.requestHeaders.realityId;
     if (!root) {
         if (result instanceof Array) {
             return result.filter(noRealityIdOrSameAsHeader);
@@ -21,7 +23,7 @@ const realitiesMiddleware = async (
     } else {
         if (
             noRealityIdOrSameAsHeader(result) ||
-            (context.includeLinkedOper && result.realityId === operationalRealityId)
+            (context.requestHeaders.includeLinkedOper && result.realityId === operationalRealityId)
         )
             return result;
     }

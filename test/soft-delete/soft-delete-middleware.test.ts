@@ -1,5 +1,6 @@
 import { softDeletedMiddleware } from '../../src';
-import { PolarisBaseContext } from '@enigmatis/polaris-common';
+import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
+import { getContextWithRequestHeaders } from '../context-util';
 
 describe('soft delete middleware tests', () => {
     describe('an array instance', () => {
@@ -13,7 +14,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
                 const result = await softDeletedMiddleware(
                     resolve,
                     { name: 'bla' },
@@ -30,7 +31,7 @@ describe('soft delete middleware tests', () => {
                     { title: 'moshe', deleted: false },
                     { title: 'dani', deleted: true },
                 ];
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const resolve = async () => {
                     return objects;
@@ -49,7 +50,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(
                     resolve,
@@ -66,7 +67,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(
                     resolve,
@@ -82,7 +83,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(
                     resolve,
@@ -100,7 +101,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(resolve, undefined, {}, context, {});
                 expect(result).toBeNull();
@@ -111,7 +112,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(resolve, undefined, {}, context, {});
                 expect(result).toEqual({ title: 'moshe', deleted: false });
@@ -121,7 +122,7 @@ describe('soft delete middleware tests', () => {
                 const resolve = async () => {
                     return objects;
                 };
-                const context: PolarisBaseContext = {};
+                const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
 
                 const result = await softDeletedMiddleware(resolve, undefined, {}, context, {});
                 expect(result).toEqual({ title: 'moshe' });
