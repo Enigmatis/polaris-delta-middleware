@@ -1,6 +1,6 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 
-const realitiesMiddleware = async (
+export const realitiesMiddleware = async (
     resolve: any,
     root: any,
     args: any,
@@ -29,5 +29,3 @@ const realitiesMiddleware = async (
     }
     return null;
 };
-
-export { realitiesMiddleware };

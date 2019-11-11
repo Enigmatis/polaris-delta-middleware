@@ -1,6 +1,6 @@
 import { DATA_VERSION, PolarisGraphQLContext } from '@enigmatis/polaris-common';
 
-const dataVersionMiddleware = async (
+export const dataVersionMiddleware = async (
     resolve: any,
     root: any,
     args: any,
@@ -13,13 +13,18 @@ const dataVersionMiddleware = async (
     const result = await resolve(root, args, context, info);
     let finalResult;
     if (!root && context.requestHeaders.dataVersion && !isNaN(context.requestHeaders.dataVersion)) {
-        if (result instanceof Array) {
+        if (Array.isArray(result)) {
             finalResult = result.filter(entity =>
                 entity.dataVersion && context.requestHeaders.dataVersion
                     ? entity.dataVersion > context.requestHeaders.dataVersion
                     : entity,
             );
-        } else {
+        } else if (
+            !result.dataVersion ||
+            (result.dataVersion &&
+                context.requestHeaders.dataVersion &&
+                result.dataVersion > context.requestHeaders.dataVersion)
+        ) {
             finalResult = result;
         }
     } else {
@@ -31,10 +36,8 @@ const dataVersionMiddleware = async (
     return finalResult;
 };
 
-const initContextForDataVersion = async ({ req }: any) => {
+export const initContextForDataVersion = async ({ req }: any) => {
     return {
         dataVersion: req.headers[DATA_VERSION],
     };
 };
-
-export { dataVersionMiddleware, initContextForDataVersion };

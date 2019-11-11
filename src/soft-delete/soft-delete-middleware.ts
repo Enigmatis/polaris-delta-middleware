@@ -1,6 +1,6 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 
-const softDeletedMiddleware = async (
+export const softDeletedMiddleware = async (
     resolve: any,
     root: any,
     args: any,
@@ -26,5 +26,3 @@ const softDeletedMiddleware = async (
     // }
     return finalResult;
 };
-
-export { softDeletedMiddleware };

@@ -49,9 +49,20 @@ describe('data version middleware', () => {
             const result = await dataVersionMiddleware(resolve, undefined, {}, context, {});
             expect(result).toEqual(objects);
         });
-        it('a single entity is resolved, no filter should be applied', async () => {
+        it('a single entity with data version is resolved, filter should be applied', async () => {
             const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
             const objects = { title: 'moshe', dataVersion: 2 };
+            const resolve = async () => {
+                return objects;
+            };
+
+            const result = await dataVersionMiddleware(resolve, undefined, {}, context, {});
+            expect(result).toBeUndefined();
+        });
+
+        it('a single entity without data version is resolved, no filter should be applied', async () => {
+            const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
+            const objects = { title: 'foo' };
             const resolve = async () => {
                 return objects;
             };
