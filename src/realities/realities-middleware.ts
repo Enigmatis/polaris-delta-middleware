@@ -9,16 +9,16 @@ export const realitiesMiddleware = async (
 ) => {
     const result = await resolve(root, args, context, info);
     const operationalRealityId: number = 0;
-    context.requestHeaders.realityId = context.requestHeaders.realityId
-        ? context.requestHeaders.realityId
-        : 0;
+    context.requestHeaders.realityId = context.requestHeaders.realityId || 0;
     const noRealityIdOrSameAsHeader = (entity: any) =>
         entity.realityId === undefined || entity.realityId === context.requestHeaders.realityId;
     if (!root) {
         if (result instanceof Array) {
             return result.filter(noRealityIdOrSameAsHeader);
         } else {
-            if (noRealityIdOrSameAsHeader(result)) return result;
+            if (noRealityIdOrSameAsHeader(result)) {
+                return result;
+            }
         }
     } else {
         if (

@@ -38,9 +38,9 @@ export class ExtensionsListener implements GraphQLRequestListener {
         } else {
             if (this.dataVersionRepository) {
                 try {
-                    const result = await this.dataVersionRepository.find();
-                    if (result.length >= 1) {
-                        response.extensions.dataVersion = result[0].value;
+                    const result = await this.dataVersionRepository.findOne();
+                    if (result) {
+                        response.extensions.dataVersion = result.value;
                     }
                     // if (context.logger) {
                     //     context.logger.debug('Data Version extension finished instrumenting', {

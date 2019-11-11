@@ -9,8 +9,8 @@ describe('data-version extensions listener test', () => {
             let extension: any;
             beforeEach(() => {
                 dataVersionRepo = {
-                    find: async () => {
-                        return [{ id: 1, value: 2 }];
+                    findOne: async () => {
+                        return { id: 1, value: 2 };
                     },
                 };
                 extension = new ExtensionsListener(dataVersionRepo);
@@ -20,7 +20,7 @@ describe('data-version extensions listener test', () => {
                 let findSpy: any;
                 beforeEach(() => {
                     requestContext = getContextWithRequestHeaders({ dataVersion: 3 });
-                    findSpy = jest.spyOn(dataVersionRepo, 'find');
+                    findSpy = jest.spyOn(dataVersionRepo, 'findOne');
                 });
                 describe('context has global data version', () => {
                     beforeEach(() => {
@@ -29,14 +29,14 @@ describe('data-version extensions listener test', () => {
                     it('response extensions contain global data version and repo is not called', async () => {
                         const response = await extension.willSendResponse(requestContext);
                         expect(response.response.extensions).toMatchObject({ dataVersion: 4 });
-                        expect(dataVersionRepo.find).not.toHaveBeenCalled();
+                        expect(dataVersionRepo.findOne).not.toHaveBeenCalled();
                     });
                 });
                 describe('context has no global data version', () => {
                     it('response extensions contain global data version and repo is called', async () => {
                         const response = await extension.willSendResponse(requestContext);
                         expect(response.response.extensions).toMatchObject({ dataVersion: 2 });
-                        expect(dataVersionRepo.find).toHaveBeenCalledTimes(1);
+                        expect(dataVersionRepo.findOne).toHaveBeenCalledTimes(1);
                     });
                 });
             });
