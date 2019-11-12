@@ -3,7 +3,7 @@ import {
     GraphQLRequestContext,
     GraphQLRequestListener,
 } from 'apollo-server-plugin-base';
-import { ExtensionsListener } from '..';
+import { ExtensionsListener } from '../listeners/extensions-listener';
 
 export class ExtensionsPlugin implements ApolloServerPlugin {
     private readonly dataVersionRepository: any;
