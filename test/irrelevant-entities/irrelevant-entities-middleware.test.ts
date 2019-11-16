@@ -1,60 +1,54 @@
-import { irrelevantEntitiesMiddleware } from '../../src/irrelevant-entities/irrelevant-entities-middleware';
+import { IrrelevantEntitiesMiddleware } from '../../src';
 
-const testContext = { res: { locals: { irrelevantEntities: {} } } };
-const testArgs = {};
-const testInfo = { path: { key: 'yed' } };
+const result = [{ id: '1' }, { id: '3' }, { id: '5' }];
+const irrResult = [{ id: '2' }, { id: '4' }, { id: '6' }];
+const bookRepo = {
+    find: jest.fn(() => irrResult),
+} as any;
+const connection = { getRepository: jest.fn(() => bookRepo) } as any;
+const logger = { debug: jest.fn() } as any;
+const irrelevantEntitiesMiddleware = new IrrelevantEntitiesMiddleware(
+    connection,
+    logger,
+).getMiddleware();
 
 describe('Irrelevant entities middleware', () => {
-    describe('temp irrelevant entities in res', () => {
-        const entitiesReoslverWithIrrelevant = async (
-            root: any,
-            args: any,
-            context: any,
-            info: any,
-        ) => {
-            context.res.locals.tempIrrelevant = ['1', '3'];
-            return {};
-        };
-        it('puts the temp irrelevant entities under key in res irrelevant entities', async () => {
-            await irrelevantEntitiesMiddleware(
-                entitiesReoslverWithIrrelevant,
-                undefined,
-                testArgs,
-                testContext,
-                testInfo,
-            );
-
-            expect(testContext.res.locals.irrelevantEntities).toEqual({ yed: ['1', '3'] });
+    describe('irrelevant entities in returned extensions', () => {
+        it('context without data version, context doesnt change', async () => {
+            let testContext = {} as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {});
+            expect(testContext).toEqual({});
+            testContext = { requestHeaders: {} } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {});
+            expect(testContext).toEqual({ requestHeaders: {} } as any);
+            testContext = { requestHeaders: { dataVersion: undefined } } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {});
+            expect(testContext).toEqual({ requestHeaders: { dataVersion: undefined } } as any);
         });
 
-        it('appends to irrelevant entities key for multiple queries', async () => {
-            // @ts-ignore
-            testContext.res.locals.irrelevantEntities.lol = ['1', '555'];
-            await irrelevantEntitiesMiddleware(
-                entitiesReoslverWithIrrelevant,
-                undefined,
-                testArgs,
-                testContext,
-                testInfo,
-            );
-
-            expect(testContext.res.locals.irrelevantEntities).toEqual({
-                lol: ['1', '555'],
-                yed: ['1', '3'],
+        it('appends irrelevant entities by query name', async () => {
+            const evenIds = ['2', '4', '6'];
+            const testContext = { requestHeaders: { dataVersion: 1 } } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {
+                returnType: { ofType: { name: 'Book' } },
+                path: { key: 'getEven' },
             });
+            expect(testContext.returnedExtensions.irrelevantEntities).toEqual({ getEven: evenIds });
         });
-
-        it('deletes the temp irrelevant for further queries', async () => {
-            await irrelevantEntitiesMiddleware(
-                entitiesReoslverWithIrrelevant,
-                undefined,
-                testArgs,
-                testContext,
-                testInfo,
-            );
-
-            // @ts-ignore
-            expect(testContext.res.locals.tempIrrelevant).not.toBeDefined();
+        it('appends irrelevant entities by query name, multiple queries', async () => {
+            const evenIds = ['2', '4', '6'];
+            const testContext = {
+                requestHeaders: { dataVersion: 1 },
+                returnedExtensions: { irrelevantEntities: { getOdd: result } },
+            } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {
+                returnType: { ofType: { name: 'Book' } },
+                path: { key: 'getEven' },
+            });
+            expect(testContext.returnedExtensions.irrelevantEntities).toEqual({
+                getEven: evenIds,
+                getOdd: result,
+            });
         });
     });
 });

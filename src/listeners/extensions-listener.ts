@@ -1,63 +1,23 @@
 import { GraphQLRequestListener } from 'apollo-server-plugin-base';
-import { PolarisExtensions, PolarisRequestHeaders } from '@enigmatis/polaris-common';
+import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
+import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 
 export class ExtensionsListener implements GraphQLRequestListener {
-    private readonly dataVersionRepository: any;
+    readonly logger: any;
 
-    constructor(dataVersionRepository?: any) {
-        if (dataVersionRepository) {
-            this.dataVersionRepository = dataVersionRepository;
-        }
+    constructor(logger: PolarisGraphQLLogger) {
+        this.logger = logger;
     }
 
     async willSendResponse(requestContext: any) {
         const {
-            requestHeaders,
-            returnedExtensions,
+            context,
             response,
-        }: {
-            requestHeaders: PolarisRequestHeaders;
-            returnedExtensions: PolarisExtensions;
-            response: any;
-        } = requestContext;
-        // if (context.logger) {
-        //     context.logger.debug('Data Version extension started instrumenting', { context });
-        // }
-        if (!response.extensions) {
-            response.extensions = {};
+        }: { context: PolarisGraphQLContext; response: any } = requestContext;
+        if (context.returnedExtensions) {
+            this.logger.debug('extensions were set to response');
+            response.extensions = context.returnedExtensions;
         }
-
-        if (requestHeaders.dataVersion) {
-            if (returnedExtensions.irrelevantEntities) {
-                response.extensions.irrelevantEntities = returnedExtensions.irrelevantEntities;
-            }
-        }
-
-        if (returnedExtensions.globalDataVersion) {
-            response.extensions.dataVersion = returnedExtensions.globalDataVersion;
-        } else {
-            if (this.dataVersionRepository) {
-                try {
-                    const result = await this.dataVersionRepository.findOne();
-                    if (result) {
-                        response.extensions.dataVersion = result.value;
-                    }
-                    // if (context.logger) {
-                    //     context.logger.debug('Data Version extension finished instrumenting', {
-                    //         context,
-                    //     });
-                    // }
-                } catch (err) {
-                    // if (context.logger) {
-                    //     context.logger.error('Error fetching data version for extensions', {
-                    //         context,
-                    //         graphqlLogProperties: { throwable: err },
-                    //     });
-                    // }
-                }
-            }
-        }
-
         return requestContext;
     }
 }
