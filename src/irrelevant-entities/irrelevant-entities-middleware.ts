@@ -23,16 +23,16 @@ export class IrrelevantEntitiesMiddleware {
             if (
                 context &&
                 context.requestHeaders &&
-                context.requestHeaders.dataVersion !== undefined
+                context.requestHeaders.dataVersion !== undefined &&
+                info.returnType.ofType
             ) {
                 const irrelevantWhereCriteria: any =
                     Array.isArray(result) && result.length > 0
                         ? { id: Not(In(result.map((x: any) => x.id))) }
                         : {};
-                irrelevantWhereCriteria.deleted = [true, false];
+                irrelevantWhereCriteria.deleted = In([true, false]);
                 const type = info.returnType.ofType.name;
-                const repo = this.connection.getRepository(type);
-                const resultIrrelevant: any = await repo.find({
+                let resultIrrelevant: any = await this.connection.getRepository(type).find({
                     select: ['id'],
                     where: irrelevantWhereCriteria,
                 });
