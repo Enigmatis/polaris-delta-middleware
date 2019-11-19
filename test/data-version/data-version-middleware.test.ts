@@ -8,7 +8,7 @@ const dvRepo: any = {
 };
 const connection: any = { getRepository: jest.fn(() => dvRepo) };
 const logger: any = { debug: jest.fn() };
-const dataVersionMiddleware = new DataVersionMiddleware(connection, logger).getMiddleware();
+const dataVersionMiddleware = new DataVersionMiddleware(logger, connection).getMiddleware();
 
 describe('data version middleware', () => {
     describe('root resolver', () => {

@@ -2,10 +2,10 @@ import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { Not, In, Connection } from '@enigmatis/polaris-typeorm';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 export class IrrelevantEntitiesMiddleware {
-    readonly connection: Connection;
+    readonly connection?: Connection;
     readonly logger: PolarisGraphQLLogger;
 
-    constructor(connection: Connection, logger: PolarisGraphQLLogger) {
+    constructor(logger: PolarisGraphQLLogger, connection?: Connection) {
         this.connection = connection;
         this.logger = logger;
     }
@@ -24,7 +24,8 @@ export class IrrelevantEntitiesMiddleware {
                 context &&
                 context.requestHeaders &&
                 context.requestHeaders.dataVersion !== undefined &&
-                info.returnType.ofType
+                info.returnType.ofType &&
+                this.connection
             ) {
                 const irrelevantWhereCriteria: any =
                     Array.isArray(result) && result.length > 0
@@ -32,7 +33,7 @@ export class IrrelevantEntitiesMiddleware {
                         : {};
                 irrelevantWhereCriteria.deleted = In([true, false]);
                 const type = info.returnType.ofType.name;
-                let resultIrrelevant: any = await this.connection.getRepository(type).find({
+                const resultIrrelevant: any = await this.connection.getRepository(type).find({
                     select: ['id'],
                     where: irrelevantWhereCriteria,
                 });

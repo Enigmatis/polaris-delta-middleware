@@ -8,8 +8,8 @@ const bookRepo = {
 const connection = { getRepository: jest.fn(() => bookRepo) } as any;
 const logger = { debug: jest.fn() } as any;
 const irrelevantEntitiesMiddleware = new IrrelevantEntitiesMiddleware(
-    connection,
     logger,
+    connection,
 ).getMiddleware();
 
 describe('Irrelevant entities middleware', () => {

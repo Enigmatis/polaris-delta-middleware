@@ -29,15 +29,14 @@ export class RealitiesMiddleware {
                         return result;
                     }
                 }
-            } else {
-                // what about 3rd degree?
-                if (
-                    noRealityIdOrSameAsHeader(result) ||
-                    (context.requestHeaders.includeLinkedOper &&
-                        result.realityId === operationalRealityId)
-                )
-                    return result;
+            } else if (
+                noRealityIdOrSameAsHeader(result) ||
+                (context.requestHeaders.includeLinkedOper &&
+                    result.realityId === operationalRealityId)
+            ) {
+                return result;
             }
+
             return null;
         };
     }

@@ -3,10 +3,10 @@ import { DataVersion, Connection } from '@enigmatis/polaris-typeorm';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 
 export class DataVersionMiddleware {
-    readonly connection: Connection;
+    readonly connection?: Connection;
     readonly logger: PolarisGraphQLLogger;
 
-    constructor(connection: Connection, logger: PolarisGraphQLLogger) {
+    constructor(logger: PolarisGraphQLLogger, connection?: Connection) {
         this.connection = connection;
         this.logger = logger;
     }
@@ -53,6 +53,7 @@ export class DataVersionMiddleware {
     }
 
     async updateDataVersionInReturnedExtensions(context: PolarisGraphQLContext) {
+        if(!this.connection) return;
         const dataVersionRepo = this.connection.getRepository(DataVersion);
         const globalDataVersion: any = await dataVersionRepo.findOne();
         if (globalDataVersion) {
