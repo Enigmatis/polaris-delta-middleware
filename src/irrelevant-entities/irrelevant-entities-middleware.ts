@@ -25,6 +25,7 @@ export class IrrelevantEntitiesMiddleware {
                 context &&
                 context.requestHeaders &&
                 context.requestHeaders.dataVersion !== undefined &&
+                !isNaN(context.requestHeaders.dataVersion) &&
                 info.returnType.ofType &&
                 this.connection &&
                 !root
