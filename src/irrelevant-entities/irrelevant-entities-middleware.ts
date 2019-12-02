@@ -1,16 +1,17 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
-import { Not, In, Connection } from '@enigmatis/polaris-typeorm';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
+import { Connection, In, Not } from '@enigmatis/polaris-typeorm';
+
 export class IrrelevantEntitiesMiddleware {
-    readonly connection?: Connection;
-    readonly logger: PolarisGraphQLLogger;
+    public readonly connection?: Connection;
+    public readonly logger: PolarisGraphQLLogger;
 
     constructor(logger: PolarisGraphQLLogger, connection?: Connection) {
         this.connection = connection;
         this.logger = logger;
     }
 
-    getMiddleware() {
+    public getMiddleware() {
         return async (
             resolve: any,
             root: any,
@@ -18,26 +19,34 @@ export class IrrelevantEntitiesMiddleware {
             context: PolarisGraphQLContext,
             info: any,
         ) => {
-            this.logger.debug('Irrelevant entities middleware started job', { context });
+            this.logger.debug('Irrelevant entities middleware started job fuck', { context });
             const result = await resolve(root, args, context, info);
             if (
                 context &&
                 context.requestHeaders &&
                 context.requestHeaders.dataVersion !== undefined &&
                 info.returnType.ofType &&
-                this.connection
+                this.connection &&
+                !root
             ) {
                 const irrelevantWhereCriteria: any =
                     Array.isArray(result) && result.length > 0
                         ? { id: Not(In(result.map((x: any) => x.id))) }
                         : {};
                 irrelevantWhereCriteria.deleted = In([true, false]);
-                const type = info.returnType.ofType.name;
-                const resultIrrelevant: any = await this.connection.getRepository(type).find({
+                irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
+
+                let type = info.returnType;
+                while(!type.name){
+                    type = type.ofType;
+                }
+                const typeName = type.name;
+
+                const resultIrrelevant: any = await this.connection.getRepository(typeName).find({
                     select: ['id'],
                     where: irrelevantWhereCriteria,
                 });
-                if (resultIrrelevant) {
+                if (resultIrrelevant && resultIrrelevant.length > 0) {
                     const irrelevantEntities: any = {};
                     irrelevantEntities[info.path.key] = resultIrrelevant.map((x: any) => x.id);
                     if (!context.returnedExtensions) {

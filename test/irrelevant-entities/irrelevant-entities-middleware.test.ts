@@ -30,7 +30,17 @@ describe('Irrelevant entities middleware', () => {
             const evenIds = ['2', '4', '6'];
             const testContext = { requestHeaders: { dataVersion: 1 } } as any;
             await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {
-                returnType: { ofType: { name: 'Book' } },
+                returnType:{ofType:{name:"Book"}},
+                path: { key: 'getEven' },
+            });
+            expect(testContext.returnedExtensions.irrelevantEntities).toEqual({ getEven: evenIds });
+        });
+
+        it('keeps searching for the query type even if its complex', async () => {
+            const evenIds = ['2', '4', '6'];
+            const testContext = { requestHeaders: { dataVersion: 1 } } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {
+                returnType:{ofType:{ofType:{name:"Book"}}},
                 path: { key: 'getEven' },
             });
             expect(testContext.returnedExtensions.irrelevantEntities).toEqual({ getEven: evenIds });
@@ -42,13 +52,22 @@ describe('Irrelevant entities middleware', () => {
                 returnedExtensions: { irrelevantEntities: { getOdd: result } },
             } as any;
             await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {
-                returnType: { ofType: { name: 'Book' } },
+                returnType:{ofType:{name:"Book"}},
                 path: { key: 'getEven' },
             });
             expect(testContext.returnedExtensions.irrelevantEntities).toEqual({
                 getEven: evenIds,
                 getOdd: result,
             });
+        });
+
+        it('not searches for irrelevant if root is defined', async () => {
+            const testContext = { requestHeaders: { dataVersion: 1 } } as any;
+            await irrelevantEntitiesMiddleware(jest.fn(), {}, {}, testContext, {
+                returnType:{ofType:{name:"Book"}},
+                path: { key: 'getEven' },
+            });
+            expect(testContext.returnedExtensions).toBeUndefined();
         });
     });
 });
