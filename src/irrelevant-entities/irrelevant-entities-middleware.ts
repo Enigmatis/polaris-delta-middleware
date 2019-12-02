@@ -19,7 +19,7 @@ export class IrrelevantEntitiesMiddleware {
             context: PolarisGraphQLContext,
             info: any,
         ) => {
-            this.logger.debug('Irrelevant entities middleware started job fuck', { context });
+            this.logger.debug('Irrelevant entities middleware started job', { context });
             const result = await resolve(root, args, context, info);
             if (
                 context &&
@@ -37,7 +37,7 @@ export class IrrelevantEntitiesMiddleware {
                 irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
 
                 let type = info.returnType;
-                while(!type.name){
+                while (!type.name) {
                     type = type.ofType;
                 }
                 const typeName = type.name;
