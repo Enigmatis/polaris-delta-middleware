@@ -11,6 +11,15 @@ export class IrrelevantEntitiesMiddleware {
         this.logger = logger;
     }
 
+    private getTypeName(info: any) : string {
+        let type = info.returnType;
+        while (!type.name) {
+            type = type.ofType;
+        }
+        const typeName = type.name;
+        return typeName;
+    }
+
     public getMiddleware() {
         return async (
             resolve: any,
@@ -30,40 +39,43 @@ export class IrrelevantEntitiesMiddleware {
                 this.connection &&
                 !root
             ) {
-                const irrelevantWhereCriteria: any =
-                    Array.isArray(result) && result.length > 0
-                        ? { id: Not(In(result.map((x: any) => x.id))) }
-                        : {};
-                irrelevantWhereCriteria.deleted = In([true, false]);
-                irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
-
-                let type = info.returnType;
-                while (!type.name) {
-                    type = type.ofType;
-                }
-                const typeName = type.name;
-
+                const irrelevantWhereCriteria = this.createIrrelevantWhereCriteria(result, context);
+                const typeName = this.getTypeName(info);
                 const resultIrrelevant: any = await this.connection.getRepository(typeName).find({
                     select: ['id'],
                     where: irrelevantWhereCriteria,
                 });
                 if (resultIrrelevant && resultIrrelevant.length > 0) {
-                    const irrelevantEntities: any = {};
-                    irrelevantEntities[info.path.key] = resultIrrelevant.map((x: any) => x.id);
-                    if (!context.returnedExtensions) {
-                        context.returnedExtensions = {} as any;
-                    }
-                    context.returnedExtensions = {
-                        ...context.returnedExtensions,
-                        irrelevantEntities: {
-                            ...context.returnedExtensions.irrelevantEntities,
-                            ...irrelevantEntities,
-                        },
-                    } as any;
+                    this.appendIrrelevantEntitiesToExtensions(info, resultIrrelevant, context);
                 }
             }
             this.logger.debug('Irrelevant entities middleware finished job', { context });
             return result;
         };
+    }
+
+    private appendIrrelevantEntitiesToExtensions(info: any, resultIrrelevant: any, context: PolarisGraphQLContext) {
+        const irrelevantEntities: any = {};
+        irrelevantEntities[info.path.key] = resultIrrelevant.map((x: any) => x.id);
+        if (!context.returnedExtensions) {
+            context.returnedExtensions = {} as any;
+        }
+        context.returnedExtensions = {
+            ...context.returnedExtensions,
+            irrelevantEntities: {
+                ...context.returnedExtensions.irrelevantEntities,
+                ...irrelevantEntities,
+            },
+        } as any;
+    }
+
+    private createIrrelevantWhereCriteria(result: any, context: PolarisGraphQLContext) {
+        const irrelevantWhereCriteria: any =
+            Array.isArray(result) && result.length > 0
+                ? {id: Not(In(result.map((x: any) => x.id)))}
+                : {};
+        irrelevantWhereCriteria.deleted = In([true, false]);
+        irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
+        return irrelevantWhereCriteria;
     }
 }
