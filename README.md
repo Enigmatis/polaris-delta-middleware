@@ -10,7 +10,7 @@ You can use these middlewares & extensions separately using your apollo server.
 
 For example:
 
-```typescript
+```javascript
 import { makeExecutableSchema, applyMiddleware, ApolloServer } from 'apollo-server';
 import {
     DataVersionMiddleware,
@@ -68,8 +68,13 @@ const beforeMiddleware = [
 const afterMiddleware = [{ title: 'y', deleted: false }];
 ```
 
-## Irrelevant entities extension
+## Irrelevant entities
 
+These are entities with greater data version than the data version that was provided in the request,
+but that do not pass the filter you provided. For example, if you ask for items with data version greater than 1,
+which start with the letter 'a', the response will contain (in it's extensions) a list of ids of irrelevant entities -
+items which were updated after this data version (their data version is greater), but that their letter does not start with
+the letter 'a' (so they do not fit to the filter).\
 If your context object contains an irrelevant entities object under property `context.returnedExtensions.irrelevantEntities`,
 it adds the value of this property to the extensions object in the graphql response.
 
@@ -86,7 +91,7 @@ const response = {
     data: {...},
     errors:[],
     extensions: {
-        books: [1,2,3]
+        books: [1, 2, 3]
     }
 }
 ```
