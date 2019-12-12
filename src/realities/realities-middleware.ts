@@ -17,8 +17,8 @@ export class RealitiesMiddleware {
             info: any,
         ) => {
             const result = await resolve(root, args, context, info);
-            if (!result) {
-                return;
+            if (result === undefined || result === null) {
+                return result;
             }
             const operationalRealityId: number = 0;
             context.requestHeaders.realityId = context.requestHeaders.realityId || 0;

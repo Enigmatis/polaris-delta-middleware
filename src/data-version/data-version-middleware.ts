@@ -28,7 +28,8 @@ export class DataVersionMiddleware {
                 context.requestHeaders &&
                 context.requestHeaders.dataVersion &&
                 !isNaN(context.requestHeaders.dataVersion) &&
-                result !== undefined
+                result !== undefined &&
+                result !== null
             ) {
                 if (Array.isArray(result)) {
                     finalResult = result.filter(entity =>
