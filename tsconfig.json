@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "es2017",
     "sourceMap": true,
-    "outDir": "../polaris-core/node_modules/@enigmatis/polaris-middlewares/dist",
+    "outDir": "./dist",
     "strict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,

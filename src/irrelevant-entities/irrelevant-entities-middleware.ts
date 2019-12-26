@@ -1,6 +1,12 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { Connection, getConnectionManager, In, Not , PolarisFindManyOptions} from '@enigmatis/polaris-typeorm';
+import {
+    Connection,
+    getConnectionManager,
+    In,
+    Not,
+    PolarisFindManyOptions,
+} from '@enigmatis/polaris-typeorm';
 
 export class IrrelevantEntitiesMiddleware {
     private static getTypeName(info: any): string {
