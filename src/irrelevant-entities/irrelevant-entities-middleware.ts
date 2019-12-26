@@ -1,6 +1,7 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { Connection, In, Not } from '@enigmatis/polaris-typeorm';
+import { Connection, getConnectionManager, In, Not } from '@enigmatis/polaris-typeorm';
+import get = Reflect.get;
 
 export class IrrelevantEntitiesMiddleware {
     private static getTypeName(info: any): string {
@@ -57,13 +58,14 @@ export class IrrelevantEntitiesMiddleware {
         ) => {
             this.logger.debug('Irrelevant entities middleware started job', { context });
             const result = await resolve(root, args, context, info);
+            const connection = getConnectionManager().get();
             if (
                 context &&
                 context.requestHeaders &&
                 context.requestHeaders.dataVersion !== undefined &&
                 !isNaN(context.requestHeaders.dataVersion) &&
                 info.returnType.ofType &&
-                this.connection &&
+                connection &&
                 !root
             ) {
                 const irrelevantWhereCriteria = IrrelevantEntitiesMiddleware.createIrrelevantWhereCriteria(
@@ -71,7 +73,7 @@ export class IrrelevantEntitiesMiddleware {
                     context,
                 );
                 const typeName = IrrelevantEntitiesMiddleware.getTypeName(info);
-                const resultIrrelevant: any = await this.connection.getRepository(typeName).find({
+                const resultIrrelevant: any = await connection.getRepository(typeName).find({
                     select: ['id'],
                     where: irrelevantWhereCriteria,
                 });
