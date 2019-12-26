@@ -1,7 +1,6 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { Connection, getConnectionManager, In, Not } from '@enigmatis/polaris-typeorm';
-import get = Reflect.get;
+import { Connection, getConnectionManager, In, Not , PolarisFindManyOptions} from '@enigmatis/polaris-typeorm';
 
 export class IrrelevantEntitiesMiddleware {
     private static getTypeName(info: any): string {
@@ -73,10 +72,15 @@ export class IrrelevantEntitiesMiddleware {
                     context,
                 );
                 const typeName = IrrelevantEntitiesMiddleware.getTypeName(info);
-                const resultIrrelevant: any = await connection.getRepository(typeName).find({
-                    select: ['id'],
-                    where: irrelevantWhereCriteria,
-                });
+                const resultIrrelevant: any = await connection.getRepository(typeName).find(
+                    new PolarisFindManyOptions(
+                        {
+                            select: ['id'],
+                            where: irrelevantWhereCriteria,
+                        },
+                        context,
+                    ),
+                );
                 if (resultIrrelevant && resultIrrelevant.length > 0) {
                     IrrelevantEntitiesMiddleware.appendIrrelevantEntitiesToExtensions(
                         info,
