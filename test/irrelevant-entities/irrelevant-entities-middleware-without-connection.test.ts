@@ -14,7 +14,7 @@ polarisTypeormModule.getConnectionManager = jest.fn(() => {
 
 describe('no connection', () => {
     it('no irrelevant entities in returned extensions', async () => {
-        let testContext = {} as any;
+        const testContext = { returnedExtensions: {} } as any;
         await irrelevantEntitiesMiddleware(jest.fn(), undefined, {}, testContext, {});
         expect(testContext.returnedExtensions.irrelevantEntities).toBeUndefined();
     });
