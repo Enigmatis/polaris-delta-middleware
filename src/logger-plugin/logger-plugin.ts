@@ -5,6 +5,7 @@ import {
     GraphQLRequestContext,
     GraphQLRequestListener,
 } from 'apollo-server-plugin-base';
+import { RequestListenerForLoggerPlugin } from './request-listener-for-logger';
 
 export class LoggerPlugin implements ApolloServerPlugin {
     public readonly logger: PolarisGraphQLLogger;
@@ -25,27 +26,5 @@ export class LoggerPlugin implements ApolloServerPlugin {
             },
         });
         return new RequestListenerForLoggerPlugin(this.logger);
-    };
-}
-
-export class RequestListenerForLoggerPlugin implements GraphQLRequestListener {
-    public readonly logger: PolarisGraphQLLogger;
-
-    constructor(logger: PolarisGraphQLLogger) {
-        this.logger = logger;
-    }
-
-    public willSendResponse = async (requestContext: any) => {
-        const {
-            context,
-            response,
-        }: { context: PolarisGraphQLContext; response: any } = requestContext;
-        this.logger.info(`A response was sent to the client`, {
-            context,
-            polarisLogProperties: {
-                response,
-            },
-        });
-        return requestContext;
     };
 }
