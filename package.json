@@ -9,9 +9,10 @@
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "lint:fix": "npm run tslint-check && tslint -p . --fix",
     "test": "jest --runInBand",
-    "build": "rimraf dist && tsc -p tsconfig.json && npm run lint:fix",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "semantic-release": "semantic-release",
-    "travis-deploy-once": "travis-deploy-once"
+    "travis-deploy-once": "travis-deploy-once",
+    "prepare": "npm run lint:fix && npm run build"
   },
   "publishConfig": {
     "access": "public"

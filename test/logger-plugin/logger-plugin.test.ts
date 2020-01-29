@@ -1,7 +1,7 @@
-import { LoggerPlugin } from '../../src';
-import { loggerMock } from '../mocks/logger-mock';
 import { GraphQLRequestContext } from 'apollo-server-plugin-base';
+import { LoggerPlugin } from '../../src';
 import { loggerPluginMessages } from '../../src/logger-plugin/logger-plugin-messages';
+import { loggerMock } from '../mocks/logger-mock';
 
 describe('LoggerPlugin tests', () => {
     const loggerPlugin = new LoggerPlugin(loggerMock as any);
