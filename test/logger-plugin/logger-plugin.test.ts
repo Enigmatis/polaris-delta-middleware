@@ -1,4 +1,3 @@
-import { GraphQLRequestContext } from 'apollo-server-plugin-base';
 import { LoggerPlugin } from '../../src';
 import { loggerPluginMessages } from '../../src/logger-plugin/logger-plugin-messages';
 import { loggerMock } from '../mocks/logger-mock';
@@ -9,7 +8,7 @@ describe('LoggerPlugin tests', () => {
     describe('requestDidStart tests', () => {
         test('a log is written', () => {
             // act
-            loggerPlugin.requestDidStart(requestContext as unknown as GraphQLRequestContext);
+            loggerPlugin.requestDidStart(requestContext as any);
             // assert
             expect(loggerMock.info).toHaveBeenCalledWith
             (loggerPluginMessages.requestReceived,

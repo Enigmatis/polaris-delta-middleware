@@ -1,16 +1,14 @@
-import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 import { loggerPluginMessages } from '../../src/logger-plugin/logger-plugin-messages';
 import { RequestListenerForLoggerPlugin } from '../../src/logger-plugin/request-listener-for-logger';
 import { loggerMock } from '../mocks/logger-mock';
 
 describe('RequestListenerForLoggerPlugin tests', () => {
-    // @ts-ignore
     const requestContext = { context: jest.fn(), response: jest.fn() };
     const listener = new RequestListenerForLoggerPlugin(loggerMock as any);
     describe('willSendResponse tests', () => {
         test('a log is written with response', async () => {
             // act
-            await listener.willSendResponse(requestContext);
+            await listener.willSendResponse(requestContext as any);
             // assert
             expect(loggerMock.info).toHaveBeenCalledWith(loggerPluginMessages.responseSent, {
                 context: requestContext.context,
@@ -21,8 +19,7 @@ describe('RequestListenerForLoggerPlugin tests', () => {
     describe('executionDidStart tests', () => {
         test('a log is written', () => {
             // act
-            // @ts-ignore
-            listener.executionDidStart(requestContext);
+            listener.executionDidStart(requestContext as any);
             // assert
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.executionBegan, {
                 context: requestContext.context,
@@ -32,8 +29,7 @@ describe('RequestListenerForLoggerPlugin tests', () => {
     describe('parsingDidStart tests', () => {
         test('a log is written', () => {
             // act
-            // @ts-ignore
-            listener.parsingDidStart(requestContext);
+            listener.parsingDidStart(requestContext as any);
             // assert
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.parsingBegan, {
                 context: requestContext.context,
@@ -43,8 +39,7 @@ describe('RequestListenerForLoggerPlugin tests', () => {
     describe('validationDidStart tests', () => {
         test('a log is written', () => {
             // act
-            // @ts-ignore
-            listener.validationDidStart(requestContext);
+            listener.validationDidStart(requestContext as any);
             // assert
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.validationBegan, {
                 context: requestContext.context,
