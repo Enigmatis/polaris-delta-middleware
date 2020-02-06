@@ -1,16 +1,15 @@
 import {
-    PolarisError,
     PolarisGraphQLContext,
     RealitiesHolder,
 } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 import {
     Connection,
-    getConnectionManager,
     In,
     Not,
     PolarisFindManyOptions,
 } from '@enigmatis/polaris-typeorm';
+import { getConnectionForReality } from '../utills/connection-retriever';
 
 export class IrrelevantEntitiesMiddleware {
     private static getTypeName(info: any): string {
@@ -80,7 +79,7 @@ export class IrrelevantEntitiesMiddleware {
                 context.requestHeaders.realityId != null &&
                 !root
             ) {
-                const connection = this.getConnectionForReality(context.requestHeaders.realityId);
+                const connection = getConnectionForReality(context.requestHeaders.realityId, this.realitiesHolder);
                 const irrelevantWhereCriteria = IrrelevantEntitiesMiddleware.createIrrelevantWhereCriteria(
                     result,
                     context,
@@ -107,18 +106,5 @@ export class IrrelevantEntitiesMiddleware {
             this.logger.debug('Irrelevant entities middleware finished job', { context });
             return result;
         };
-    }
-
-    private getConnectionForReality(realityId: number) {
-        const connectionManager = getConnectionManager();
-        const reality = this.realitiesHolder.getReality(realityId);
-        if (!reality || !reality.name) {
-            throw new PolarisError(`Reality id: ${realityId} has no name for connection`, 500);
-        }
-        if (!connectionManager.has(reality.name)) {
-            throw new PolarisError(`There is no connections: '${reality.name}' for reality id: ${reality.id}`, 500);
-        }
-
-        return connectionManager.get(reality.name);
     }
 }
