@@ -5,6 +5,7 @@ import {
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
 import {
     Connection,
+    getConnectionManager,
     In,
     Not,
     PolarisFindManyOptions,
@@ -71,12 +72,11 @@ export class IrrelevantEntitiesMiddleware {
             const result = await resolve(root, args, context, info);
 
             if (
-                context &&
-                context.requestHeaders &&
-                context.requestHeaders.dataVersion !== undefined &&
-                !isNaN(context.requestHeaders.dataVersion) &&
+                context?.requestHeaders?.dataVersion != null &&
+                context?.requestHeaders?.realityId != null &&
+                !isNaN(context?.requestHeaders?.dataVersion) &&
                 info.returnType.ofType &&
-                context.requestHeaders.realityId != null &&
+                getConnectionManager().connections.length > 0 &&
                 !root
             ) {
                 const connection = getConnectionForReality(context.requestHeaders.realityId, this.realitiesHolder);
