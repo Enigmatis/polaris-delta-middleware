@@ -4,21 +4,27 @@ import { loggerMock } from '../mocks/logger-mock';
 
 describe('LoggerPlugin tests', () => {
     const loggerPlugin = new LoggerPlugin(loggerMock as any);
-    const requestContext = { context: jest.fn(), request: jest.fn() };
+    const context = {
+        request: {
+            query: jest.fn(),
+            operationName: jest.fn(),
+            variables: jest.fn(),
+        },
+    };
+
     describe('requestDidStart tests', () => {
         test('a log is written', () => {
-            // act
-            loggerPlugin.requestDidStart(requestContext as any);
-            // assert
-            expect(loggerMock.info).toHaveBeenCalledWith
-            (loggerPluginMessages.requestReceived,
-                {
-                    context: requestContext.context, polarisLogProperties: {
-                        request: {
-                            request: requestContext.request,
-                        },
+            loggerPlugin.requestDidStart(context);
+
+            expect(loggerMock.info).toHaveBeenCalledWith(loggerPluginMessages.requestReceived, {
+                request: {
+                    requestQuery: {
+                        query: context.request.query,
+                        operationName: context.request.operationName,
+                        polarisVariables: context.request.variables,
                     },
-                });
+                },
+            });
         });
     });
 });
