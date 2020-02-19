@@ -27,21 +27,21 @@ describe('RequestListenerForLoggerPlugin tests', () => {
     });
     describe('executionDidStart tests', () => {
         test('a log is written', () => {
-            listener.executionDidStart();
+            listener.executionDidStart(context as any);
 
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.executionBegan);
         });
     });
     describe('parsingDidStart tests', () => {
         test('a log is written', () => {
-            listener.parsingDidStart();
+            listener.parsingDidStart(context as any);
 
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.parsingBegan);
         });
     });
     describe('validationDidStart tests', () => {
         test('a log is written', () => {
-            listener.validationDidStart();
+            listener.validationDidStart(context as any);
 
             expect(loggerMock.debug).toHaveBeenCalledWith(loggerPluginMessages.validationBegan);
         });

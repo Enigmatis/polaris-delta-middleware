@@ -14,7 +14,7 @@ describe('LoggerPlugin tests', () => {
 
     describe('requestDidStart tests', () => {
         test('a log is written', () => {
-            loggerPlugin.requestDidStart(context);
+            loggerPlugin.requestDidStart(context as any);
 
             expect(loggerMock.info).toHaveBeenCalledWith(loggerPluginMessages.requestReceived, {
                 request: {

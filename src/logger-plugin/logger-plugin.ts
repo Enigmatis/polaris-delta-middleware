@@ -1,6 +1,10 @@
 import { PolarisGraphQLRequest } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin-base';
+import {
+    ApolloServerPlugin,
+    GraphQLRequestContext,
+    GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
 import { loggerPluginMessages } from './logger-plugin-messages';
 import { RequestListenerForLoggerPlugin } from './request-listener-for-logger';
 
@@ -11,8 +15,10 @@ export class LoggerPlugin implements ApolloServerPlugin {
         this.logger = logger;
     }
 
-    public requestDidStart = (context: any): GraphQLRequestListener | void => {
-        const { request } = context;
+    public requestDidStart = (
+        requestContext: GraphQLRequestContext,
+    ): GraphQLRequestListener | void => {
+        const { request } = requestContext;
         const polarisRequest: PolarisGraphQLRequest = {
             query: request.query,
             operationName: request.operationName,

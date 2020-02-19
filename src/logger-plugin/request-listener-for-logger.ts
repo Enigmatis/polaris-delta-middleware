@@ -1,5 +1,9 @@
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { GraphQLRequestListener } from 'apollo-server-plugin-base';
+import {
+    GraphQLRequestContext,
+    GraphQLRequestListener,
+    GraphQLResponse,
+} from 'apollo-server-plugin-base';
 import { loggerPluginMessages } from './logger-plugin-messages';
 
 export class RequestListenerForLoggerPlugin implements GraphQLRequestListener {
@@ -9,21 +13,29 @@ export class RequestListenerForLoggerPlugin implements GraphQLRequestListener {
         this.logger = logger;
     }
 
-    public willSendResponse = async (context: any) => {
-        const { response } = context;
+    public willSendResponse = async (requestContext: any) => {
+        const { response }: { response: GraphQLResponse } = requestContext;
         const polarisResponse = {
-            data: response.data,
-            extensions: response.extensions,
-            errors: response.errors,
+            data: response?.data,
+            errors: response?.errors,
+            extensions: response?.extensions,
         };
 
         this.logger.info(loggerPluginMessages.responseSent, {
             response: polarisResponse,
         });
-        return context;
+        return requestContext;
     };
 
-    public executionDidStart(): ((err?: Error) => void) | void {
+    public executionDidStart(
+        requestContext: GraphQLRequestContext &
+            Required<
+                Pick<
+                    GraphQLRequestContext,
+                    'metrics' | 'source' | 'document' | 'operationName' | 'operation'
+                >
+            >,
+    ): ((err?: Error) => void) | void {
         this.logger.debug(loggerPluginMessages.executionBegan);
         return err => {
             if (err) {
@@ -34,7 +46,10 @@ export class RequestListenerForLoggerPlugin implements GraphQLRequestListener {
         };
     }
 
-    public parsingDidStart(): ((err?: Error) => void) | void {
+    public parsingDidStart(
+        requestContext: GraphQLRequestContext &
+            Required<Pick<GraphQLRequestContext, 'metrics' | 'source'>>,
+    ): ((err?: Error) => void) | void {
         this.logger.debug(loggerPluginMessages.parsingBegan);
         return err => {
             if (err) {
@@ -45,7 +60,10 @@ export class RequestListenerForLoggerPlugin implements GraphQLRequestListener {
         };
     }
 
-    public validationDidStart(): ((err?: ReadonlyArray<Error>) => void) | void {
+    public validationDidStart(
+        requestContext: GraphQLRequestContext &
+            Required<Pick<GraphQLRequestContext, 'metrics' | 'source' | 'document'>>,
+    ): ((err?: ReadonlyArray<Error>) => void) | void {
         this.logger.debug(loggerPluginMessages.validationBegan);
         return err => {
             if (err) {
