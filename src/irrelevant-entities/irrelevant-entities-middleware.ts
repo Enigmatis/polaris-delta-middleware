@@ -69,7 +69,7 @@ export class IrrelevantEntitiesMiddleware {
             context: PolarisGraphQLContext,
             info: any,
         ) => {
-            this.logger.debug('Irrelevant entities middleware started job');
+            this.logger.debug('Irrelevant entities middleware started job', context);
             const result = await resolve(root, args, context, info);
 
             if (
@@ -107,7 +107,7 @@ export class IrrelevantEntitiesMiddleware {
                 }
             }
 
-            this.logger.debug('Irrelevant entities middleware finished job');
+            this.logger.debug('Irrelevant entities middleware finished job', context);
             return result;
         };
     }

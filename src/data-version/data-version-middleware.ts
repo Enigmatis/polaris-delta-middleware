@@ -26,7 +26,7 @@ export class DataVersionMiddleware {
             context: PolarisGraphQLContext,
             info: any,
         ) => {
-            this.logger.debug('Data version middleware started job');
+            this.logger.debug('Data version middleware started job', context);
             const result = await resolve(root, args, context, info);
             let finalResult = result;
             context = context || {};
@@ -56,7 +56,7 @@ export class DataVersionMiddleware {
                 }
             }
             await this.updateDataVersionInReturnedExtensions(context);
-            this.logger.debug('Data version middleware finished job');
+            this.logger.debug('Data version middleware finished job', context);
             return finalResult;
         };
     }
