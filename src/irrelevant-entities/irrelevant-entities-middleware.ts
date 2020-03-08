@@ -88,7 +88,8 @@ export class IrrelevantEntitiesMiddleware {
                     context,
                 );
                 const typeName = IrrelevantEntitiesMiddleware.getTypeName(info);
-                try {
+
+                if (connection.manager.hasRepository(typeName)) {
                     const resultIrrelevant: any = await connection
                         .getRepository(typeName)
                         .find(context, {
@@ -102,8 +103,11 @@ export class IrrelevantEntitiesMiddleware {
                             context,
                         );
                     }
-                } catch (error) {
-                    this.logger.warn(error.message, context, { throwable: error });
+                } else {
+                    this.logger.warn(
+                        'Could not find repository with the graphql object name',
+                        context,
+                    );
                 }
             }
 
