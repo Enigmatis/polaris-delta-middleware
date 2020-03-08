@@ -89,7 +89,7 @@ export class IrrelevantEntitiesMiddleware {
                 );
                 const typeName = IrrelevantEntitiesMiddleware.getTypeName(info);
 
-                if (connection.manager.hasRepository(typeName)) {
+                if (connection.hasRepository(typeName)) {
                     const resultIrrelevant: any = await connection
                         .getRepository(typeName)
                         .find(context, {
