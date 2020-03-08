@@ -88,18 +88,22 @@ export class IrrelevantEntitiesMiddleware {
                     context,
                 );
                 const typeName = IrrelevantEntitiesMiddleware.getTypeName(info);
-                const resultIrrelevant: any = await connection
-                    .getRepository(typeName)
-                    .find(context, {
-                        select: ['id'],
-                        where: irrelevantWhereCriteria,
-                    });
-                if (resultIrrelevant && resultIrrelevant.length > 0) {
-                    IrrelevantEntitiesMiddleware.appendIrrelevantEntitiesToExtensions(
-                        info,
-                        resultIrrelevant,
-                        context,
-                    );
+                try {
+                    const resultIrrelevant: any = await connection
+                        .getRepository(typeName)
+                        .find(context, {
+                            select: ['id'],
+                            where: irrelevantWhereCriteria,
+                        });
+                    if (resultIrrelevant && resultIrrelevant.length > 0) {
+                        IrrelevantEntitiesMiddleware.appendIrrelevantEntitiesToExtensions(
+                            info,
+                            resultIrrelevant,
+                            context,
+                        );
+                    }
+                } catch (error) {
+                    this.logger.warn(error.message, context, { throwable: error });
                 }
             }
 
