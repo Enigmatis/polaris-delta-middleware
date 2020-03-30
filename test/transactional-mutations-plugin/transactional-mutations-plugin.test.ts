@@ -1,4 +1,4 @@
-import { TransactionalMutationsPlugin } from '../../src/transactional-mutations-plugin/transactional-mutations-plugin';
+import { TransactionalMutationsPlugin } from '../../src';
 import { loggerMock } from '../mocks/logger-mock';
 
 let transactionalMutationsPlugin: TransactionalMutationsPlugin;
