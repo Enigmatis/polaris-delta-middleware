@@ -4,7 +4,7 @@ import { loggerMock } from '../mocks/logger-mock';
 let transactionalMutationsPlugin: TransactionalMutationsPlugin;
 
 const setUpContext = (query: string): any => {
-    const requestContext: any = {
+    return {
         request: {
             query,
             operationName: jest.fn(),
@@ -12,7 +12,6 @@ const setUpContext = (query: string): any => {
         },
         context: jest.fn(),
     };
-    return requestContext;
 };
 
 describe('transactionalMutationsPlugin tests', () => {
@@ -28,16 +27,6 @@ describe('transactionalMutationsPlugin tests', () => {
             transactionalMutationsPlugin.requestDidStart(requestContext);
 
             expect(loggerMock.debug).toHaveBeenCalledTimes(0);
-        });
-
-        it('execute a mutation, ', () => {
-            const query = 'mutation($firstName:String!, $lastName:String!){\n  createAuthor(firstName:$firstName,lastName:$lastName){\n    id\n    firstName\n    lastName\n    realityId\n  }\n}';
-            const requestContext = setUpContext(query);
-
-            transactionalMutationsPlugin.requestDidStart(requestContext);
-
-            expect(loggerMock.debug).toHaveBeenCalledTimes(1);
-            expect(loggerMock.debug).toHaveBeenCalledWith('Transactional mutations plugin started job', requestContext.context);
         });
     });
 });

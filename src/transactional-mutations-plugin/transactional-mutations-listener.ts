@@ -1,30 +1,35 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { getPolarisConnectionManager } from '@enigmatis/polaris-typeorm';
+// tslint:disable-next-line:no-duplicate-imports
+import { QueryRunner } from '@enigmatis/polaris-typeorm';
 import { GraphQLRequestContext, GraphQLRequestListener } from 'apollo-server-plugin-base';
+import { transactionalMutationsMessages } from './transactional-mutations-messages';
 
-export class TransactionalMutationsListener
-    implements GraphQLRequestListener<PolarisGraphQLContext> {
-    public readonly logger: PolarisGraphQLLogger;
+export class TransactionalMutationsListener implements GraphQLRequestListener<PolarisGraphQLContext> {
+    private readonly logger: PolarisGraphQLLogger;
+    private readonly queryRunner: QueryRunner | undefined;
 
-    constructor(logger: PolarisGraphQLLogger) {
+    constructor(logger: PolarisGraphQLLogger, queryRunner?: QueryRunner) {
         this.logger = logger;
+        this.queryRunner = queryRunner;
     }
 
     public async willSendResponse(
         requestContext: GraphQLRequestContext<PolarisGraphQLContext> &
             Required<Pick<GraphQLRequestContext<PolarisGraphQLContext>, 'metrics' | 'response'>>,
     ): Promise<void> {
-        const queryRunner = getPolarisConnectionManager().get().manager.queryRunner;
         if (
             (requestContext.errors && requestContext.errors?.length > 0) ||
-            (requestContext.response.errors && requestContext.response.errors.length > 0)
+            (requestContext.response.errors && requestContext.response.errors?.length > 0)
         ) {
-            if (queryRunner?.isTransactionActive) {
-                queryRunner?.rollbackTransaction();
+            if (this.queryRunner?.isTransactionActive) {
+                this.queryRunner.rollbackTransaction();
+                this.logger.debug(transactionalMutationsMessages.listenerRollingBackMessage, requestContext.context);
             }
-        } else if (queryRunner?.isTransactionActive) {
-            queryRunner?.commitTransaction();
+        } else if (this.queryRunner?.isTransactionActive) {
+            this.queryRunner.commitTransaction();
+            this.logger.debug(transactionalMutationsMessages.listenerCommittingMessage, requestContext.context);
         }
+        this.logger.debug(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
     }
 }
