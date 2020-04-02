@@ -1,13 +1,16 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-// tslint:disable-next-line:no-duplicate-imports
 import { QueryRunner } from '@enigmatis/polaris-typeorm';
 import { GraphQLRequestContext, GraphQLRequestListener } from 'apollo-server-plugin-base';
-import { transactionalMutationsMessages } from './transactional-mutations-messages';
+import {
+    LISTENER_COMMITTING_MESSAGE,
+    LISTENER_FINISHED_JOB,
+    LISTENER_ROLLING_BACK_MESSAGE,
+} from './transactional-mutations-messages';
 
 export class TransactionalMutationsListener implements GraphQLRequestListener<PolarisGraphQLContext> {
     private readonly logger: PolarisGraphQLLogger;
-    private readonly queryRunner: QueryRunner | undefined;
+    private readonly queryRunner?: QueryRunner;
 
     constructor(logger: PolarisGraphQLLogger, queryRunner?: QueryRunner) {
         this.logger = logger;
@@ -24,12 +27,12 @@ export class TransactionalMutationsListener implements GraphQLRequestListener<Po
         ) {
             if (this.queryRunner?.isTransactionActive) {
                 this.queryRunner.rollbackTransaction();
-                this.logger.debug(transactionalMutationsMessages.listenerRollingBackMessage, requestContext.context);
+                this.logger.warn(LISTENER_ROLLING_BACK_MESSAGE, requestContext.context);
             }
         } else if (this.queryRunner?.isTransactionActive) {
             this.queryRunner.commitTransaction();
-            this.logger.debug(transactionalMutationsMessages.listenerCommittingMessage, requestContext.context);
+            this.logger.debug(LISTENER_COMMITTING_MESSAGE, requestContext.context);
         }
-        this.logger.debug(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
+        this.logger.debug(LISTENER_FINISHED_JOB, requestContext.context);
     }
 }

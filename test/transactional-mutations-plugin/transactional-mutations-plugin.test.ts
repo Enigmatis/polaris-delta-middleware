@@ -16,7 +16,15 @@ const setUpContext = (query: string): any => {
 
 describe('transactionalMutationsPlugin tests', () => {
     beforeEach(async () => {
-        transactionalMutationsPlugin = new TransactionalMutationsPlugin(loggerMock as any);
+        const realitiesHolderMock = {
+            addRealities: jest.fn(),
+            addReality: jest.fn(),
+            updateReality: jest.fn(),
+            getReality: jest.fn(),
+            getRealitiesMap: jest.fn(),
+            hasReality: jest.fn(),
+        };
+        transactionalMutationsPlugin = new TransactionalMutationsPlugin(loggerMock as any, realitiesHolderMock as any);
     });
 
     describe('requestDidStart tests', () => {
