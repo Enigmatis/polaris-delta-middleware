@@ -1,5 +1,8 @@
 import { TransactionalMutationsListener } from '../../src/transactional-mutations-plugin/transactional-mutations-listener';
-import { transactionalMutationsMessages } from '../../src/transactional-mutations-plugin/transactional-mutations-messages';
+import {
+    LISTENER_FINISHED_JOB,
+    LISTENER_ROLLING_BACK_MESSAGE,
+} from '../../src/transactional-mutations-plugin/transactional-mutations-messages';
 import { loggerMock } from '../mocks/logger-mock';
 
 let transactionalMutationsListener: TransactionalMutationsListener;
@@ -37,9 +40,10 @@ describe('transactionalMutationsPlugin tests', () => {
             transactionalMutationsListener.willSendResponse(requestContext);
 
             expect(queryRunnerMock.rollbackTransaction).toHaveBeenCalledTimes(1);
-            expect(loggerMock.debug).toHaveBeenCalledTimes(2);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerRollingBackMessage, requestContext.context);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledTimes(1);
+            expect(loggerMock.warn).toHaveBeenCalledTimes(1);
+            expect(loggerMock.warn).toHaveBeenCalledWith(LISTENER_ROLLING_BACK_MESSAGE, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledWith(LISTENER_FINISHED_JOB, requestContext.context);
         });
 
         it('requestContext contain errors and there isn\'t transaction active, nothing happened', () => {
@@ -52,7 +56,7 @@ describe('transactionalMutationsPlugin tests', () => {
 
             expect(queryRunnerMock.rollbackTransaction).toHaveBeenCalledTimes(0);
             expect(loggerMock.debug).toHaveBeenCalledTimes(1);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledWith(LISTENER_FINISHED_JOB, requestContext.context);
         });
 
         it('requestContext response contain errors and there is transaction active, the transaction rolledBack', () => {
@@ -66,9 +70,10 @@ describe('transactionalMutationsPlugin tests', () => {
             transactionalMutationsListener.willSendResponse(requestContext);
 
             expect(queryRunnerMock.rollbackTransaction).toHaveBeenCalledTimes(1);
-            expect(loggerMock.debug).toHaveBeenCalledTimes(2);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerRollingBackMessage, requestContext.context);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledTimes(1);
+            expect(loggerMock.warn).toHaveBeenCalledTimes(1);
+            expect(loggerMock.warn).toHaveBeenCalledWith(LISTENER_ROLLING_BACK_MESSAGE, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledWith(LISTENER_FINISHED_JOB, requestContext.context);
         });
 
         it('requestContext response contain errors and there isn\'t transaction active, nothing happened', () => {
@@ -83,7 +88,7 @@ describe('transactionalMutationsPlugin tests', () => {
 
             expect(queryRunnerMock.rollbackTransaction).toHaveBeenCalledTimes(0);
             expect(loggerMock.debug).toHaveBeenCalledTimes(1);
-            expect(loggerMock.debug).toHaveBeenCalledWith(transactionalMutationsMessages.listenerFinishedJob, requestContext.context);
+            expect(loggerMock.debug).toHaveBeenCalledWith(LISTENER_FINISHED_JOB, requestContext.context);
         });
     });
 });
