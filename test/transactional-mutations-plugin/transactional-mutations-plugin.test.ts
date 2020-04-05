@@ -65,7 +65,7 @@ describe('transactionalMutationsPlugin tests', () => {
             transactionalMutationsPlugin = new TransactionalMutationsPlugin(loggerMock as any, realitiesHolderMock as any);
         });
 
-        it('execute a mutation and the startTransaction throws an error, the logger and rollback called', () => {
+        it('execute a mutation and start transaction throws an error, an error thrown and logger and rollback called', () => {
             const errorMessage = 'error';
             const queryRunner: Partial<QueryRunner> = {
                 isTransactionActive: false,
@@ -75,34 +75,14 @@ describe('transactionalMutationsPlugin tests', () => {
                 rollbackTransaction: jest.fn(),
             };
             spyOnGetConnectionForReality(queryRunner);
-
-            const mutation = 'mutation....';
-            const requestContext = setUpContext(mutation);
-
-            try {
-                transactionalMutationsPlugin.requestDidStart(requestContext);
-            } catch (e) {
-
-            }
-
-            expect(loggerMock.error).toHaveBeenCalledTimes(1);
-            expect(loggerMock.error).toHaveBeenCalledWith(errorMessage, requestContext.context);
-            expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
-        });
-
-        it('execute a mutation and start transaction throws an error, an error thrown', () => {
-            const queryRunner: Partial<QueryRunner> = {
-                isTransactionActive: false,
-                startTransaction: jest.fn().mockImplementation(() => {
-                    throw new Error();
-                }),
-                rollbackTransaction: jest.fn(),
-            };
-            spyOnGetConnectionForReality(queryRunner);
             const mutation = 'mutation....';
             const requestContext = setUpContext(mutation);
 
             expect(() => transactionalMutationsPlugin.requestDidStart(requestContext)).toThrow();
+
+            expect(loggerMock.error).toHaveBeenCalledTimes(1);
+            expect(loggerMock.error).toHaveBeenCalledWith(errorMessage, requestContext.context);
+            expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
         });
 
         it('execute a mutation and there isn\'t transaction active, start transaction was called', () => {
