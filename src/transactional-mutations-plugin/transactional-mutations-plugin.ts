@@ -1,18 +1,18 @@
-import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-common';
+import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
+import { PolarisConnection } from '@enigmatis/polaris-typeorm';
 import { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from 'apollo-server-plugin-base';
-import { getConnectionForReality } from '../utills/connection-retriever';
 import { isMutation } from '../utills/query-util';
 import { TransactionalMutationsListener } from './transactional-mutations-listener';
 import { PLUGIN_STARTED_JOB } from './transactional-mutations-messages';
 
 export class TransactionalMutationsPlugin implements ApolloServerPlugin<PolarisGraphQLContext> {
     private readonly logger: PolarisGraphQLLogger;
-    private readonly realitiesHolder: RealitiesHolder;
+    private readonly polarisConnection: PolarisConnection;
 
-    constructor(logger: PolarisGraphQLLogger, realitiesHolder: RealitiesHolder) {
+    constructor(logger: PolarisGraphQLLogger, polarisConnection: PolarisConnection) {
         this.logger = logger;
-        this.realitiesHolder = realitiesHolder;
+        this.polarisConnection = polarisConnection;
     }
 
     public requestDidStart(
@@ -20,8 +20,7 @@ export class TransactionalMutationsPlugin implements ApolloServerPlugin<PolarisG
     ): GraphQLRequestListener<PolarisGraphQLContext> | void {
         if (isMutation(requestContext.request.query)) {
             this.logger.debug(PLUGIN_STARTED_JOB, requestContext.context);
-            const realityId = requestContext.context.requestHeaders.realityId !== undefined ? requestContext.context.requestHeaders.realityId : 0;
-            const queryRunner = getConnectionForReality(realityId, this.realitiesHolder).manager.queryRunner;
+            const queryRunner = this.polarisConnection.manager.queryRunner;
             try {
                 if (!queryRunner?.isTransactionActive) {
                     queryRunner?.startTransaction();
