@@ -35,7 +35,7 @@ export class TransactionalMutationsListener
         }
         this.logger.debug(LISTENER_FINISHED_JOB, requestContext.context);
     }
-    public async endTransaction(context: PolarisGraphQLContext): Promise<void> {
+    private async endTransaction(context: PolarisGraphQLContext): Promise<void> {
         await this.queryRunner?.commitTransaction();
         this.logger.debug(LISTENER_COMMITTING_MESSAGE, context);
         this.logger.debug(LISTENER_FINISHED_JOB, context);
