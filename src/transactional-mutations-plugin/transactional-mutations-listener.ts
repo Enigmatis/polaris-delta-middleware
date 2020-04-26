@@ -8,7 +8,8 @@ import {
     LISTENER_ROLLING_BACK_MESSAGE,
 } from './transactional-mutations-messages';
 
-export class TransactionalMutationsListener implements GraphQLRequestListener<PolarisGraphQLContext> {
+export class TransactionalMutationsListener
+    implements GraphQLRequestListener<PolarisGraphQLContext> {
     private readonly logger: PolarisGraphQLLogger;
     private readonly queryRunner?: QueryRunner;
 
@@ -34,7 +35,7 @@ export class TransactionalMutationsListener implements GraphQLRequestListener<Po
         }
         this.logger.debug(LISTENER_FINISHED_JOB, requestContext.context);
     }
-    async endTransaction( context: PolarisGraphQLContext): Promise<void> {
+    public async endTransaction(context: PolarisGraphQLContext): Promise<void> {
         await this.queryRunner?.commitTransaction();
         this.logger.debug(LISTENER_COMMITTING_MESSAGE, context);
         this.logger.debug(LISTENER_FINISHED_JOB, context);
