@@ -1,6 +1,6 @@
-import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-common';
-import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { DataVersion, getConnectionForReality, PolarisConnectionManager } from '@enigmatis/polaris-typeorm';
+import {PolarisGraphQLContext, RealitiesHolder} from '@enigmatis/polaris-common';
+import {PolarisGraphQLLogger} from '@enigmatis/polaris-graphql-logger';
+import {DataVersion, getConnectionForReality, PolarisConnectionManager} from '@enigmatis/polaris-typeorm';
 
 export class DataVersionMiddleware {
     public readonly connectionManager?: PolarisConnectionManager;
@@ -54,7 +54,9 @@ export class DataVersionMiddleware {
                     finalResult = undefined;
                 }
             }
-            await this.updateDataVersionInReturnedExtensions(context);
+            if ((context.returnedExtensions?.globalDataVersion) === undefined) {
+                await this.updateDataVersionInReturnedExtensions(context);
+            }
             this.logger.debug('Data version middleware finished job', context);
             return finalResult;
         };
