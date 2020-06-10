@@ -1,20 +1,29 @@
 import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { DataVersion, getConnectionForReality, PolarisConnectionManager } from '@enigmatis/polaris-typeorm';
+import {
+    DataVersion,
+    getConnectionForReality,
+    PolarisConnection,
+    PolarisConnectionManager,
+} from '@enigmatis/polaris-typeorm';
+import { ConnectionlessConfiguration } from '..';
 
 export class DataVersionMiddleware {
     public readonly connectionManager?: PolarisConnectionManager;
     public readonly realitiesHolder: RealitiesHolder;
     public readonly logger: PolarisGraphQLLogger;
+    public readonly connectionLessConfiguration?: ConnectionlessConfiguration;
 
     constructor(
         logger: PolarisGraphQLLogger,
         realitiesHolder: RealitiesHolder,
         connectionManager?: PolarisConnectionManager,
+        connectionLessConfiguration?: ConnectionlessConfiguration,
     ) {
         this.connectionManager = connectionManager;
         this.realitiesHolder = realitiesHolder;
         this.logger = logger;
+        this.connectionLessConfiguration = connectionLessConfiguration;
     }
 
     public getMiddleware() {
@@ -70,10 +79,9 @@ export class DataVersionMiddleware {
         const connection = getConnectionForReality(
             context.requestHeaders.realityId,
             this.realitiesHolder,
-            this.connectionManager
+            this.connectionManager,
         );
-        const dataVersionRepo = connection.getRepository(DataVersion);
-        const globalDataVersion: any = await dataVersionRepo.findOne(context);
+        const globalDataVersion: DataVersion = await this.getDataVersion(connection, context);
         if (globalDataVersion) {
             context.returnedExtensions = {
                 ...context.returnedExtensions,
@@ -82,5 +90,17 @@ export class DataVersionMiddleware {
         } else {
             throw new Error('no data version found in db');
         }
+    }
+
+    private async getDataVersion(connection: PolarisConnection, context: PolarisGraphQLContext): Promise<any> {
+        let globalDataVersion: any;
+        if (this.connectionLessConfiguration) {
+            globalDataVersion = await this.connectionLessConfiguration.getDataVersion();
+        } else {
+            const dataVersionRepo = connection.getRepository(DataVersion);
+            globalDataVersion = await dataVersionRepo.findOne(context);
+        }
+
+        return globalDataVersion;
     }
 }

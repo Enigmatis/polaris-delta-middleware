@@ -4,3 +4,5 @@ export { RealitiesMiddleware } from './realities/realities-middleware';
 export { TransactionalMutationsPlugin } from './transactional-mutations-plugin/transactional-mutations-plugin';
 export { IrrelevantEntitiesMiddleware } from './irrelevant-entities/irrelevant-entities-middleware';
 export { PolarisLoggerPlugin } from './logger-plugin/polaris-logger-plugin';
+export { ConnectionlessConfiguration } from './config/connectionless-configuration';
+export { ConnectionlessIrrelevantEntitiesCriteria } from './config/connectionless-irrelevant-entities-criteria';
