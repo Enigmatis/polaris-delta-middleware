@@ -2,7 +2,7 @@ import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-commo
 import { DataVersionMiddleware } from '../../src';
 import { getContextWithRequestHeaders } from '../context-util';
 
-const dvResult = { getValue: jest.fn(() => 1) };
+const dvResult = { getValue: jest.fn(() => '1') };
 const dvRepo: any = {
     findOne: jest.fn(() => dvResult),
 };
@@ -10,10 +10,15 @@ const connection: any = { getRepository: jest.fn(() => dvRepo) };
 const logger: any = { debug: jest.fn() };
 const realitiesHolder = new RealitiesHolder();
 realitiesHolder.addReality({ id: 0, name: 'default' });
-const polarisConnectionManager = { get: jest.fn(() => connection), connections: [connection], has: jest.fn(() => true) };
+const polarisConnectionManager = {
+    get: jest.fn(() => connection),
+    connections: [connection],
+    has: jest.fn(() => true),
+};
 const dataVersionMiddleware = new DataVersionMiddleware(
     logger,
-    realitiesHolder, polarisConnectionManager as any
+    realitiesHolder,
+    polarisConnectionManager as any,
 ).getMiddleware();
 
 describe('data version middleware', () => {
@@ -24,20 +29,21 @@ describe('data version middleware', () => {
                 realityId: 0,
             });
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
+                { title: 'chen', dataVersion: '10' },
             ];
             const resolve = async () => {
                 return objects;
             };
             const result = await dataVersionMiddleware(resolve, undefined, {}, context, {});
-            expect(result).toEqual([{ title: 'dani', dataVersion: 5 }]);
+            expect(result).toEqual([{ title: 'dani', dataVersion: '5' }, { title: 'chen', dataVersion: '10' }]);
         });
         it('no data version in context, root query, no filter should be applied', async () => {
             const context: PolarisGraphQLContext = getContextWithRequestHeaders({});
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;
@@ -51,8 +57,8 @@ describe('data version middleware', () => {
                 dataVersion: undefined,
             });
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;
@@ -76,7 +82,7 @@ describe('data version middleware', () => {
         });
         it('a single entity with data version is resolved, filter should be applied', async () => {
             const context: PolarisGraphQLContext = getContextWithRequestHeaders({ dataVersion: 3 });
-            const objects = { title: 'moshe', dataVersion: 2 };
+            const objects = { title: 'moshe', dataVersion: '2' };
             const resolve = async () => {
                 return objects;
             };
@@ -105,8 +111,8 @@ describe('data version middleware', () => {
                 realityId: 0,
             });
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;
@@ -124,15 +130,15 @@ describe('data version middleware', () => {
             });
             context.returnedExtensions = undefined;
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;
             };
             const result = await dataVersionMiddleware(resolve, undefined, {}, context, {});
-            expect(result).toEqual([{ title: 'dani', dataVersion: 5 }]);
-            expect(context?.returnedExtensions?.globalDataVersion).toEqual(1);
+            expect(result).toEqual([{ title: 'dani', dataVersion: '5' }]);
+            expect(context?.returnedExtensions?.globalDataVersion).toEqual('1');
             expect(dvRepo.findOne.mock.calls.length).toBe(1);
         });
 
@@ -142,14 +148,14 @@ describe('data version middleware', () => {
                 realityId: 0,
             });
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;
             };
             const result = await dataVersionMiddleware(resolve, undefined, {}, context, {});
-            expect(result).toEqual([{ title: 'dani', dataVersion: 5 }]);
+            expect(result).toEqual([{ title: 'dani', dataVersion: '5' }]);
             expect(dvRepo.findOne.mock.calls.length).toBe(0);
         });
 
@@ -157,8 +163,8 @@ describe('data version middleware', () => {
             const context: any = getContextWithRequestHeaders({ dataVersion: 2, realityId: 0 });
             context.returnedExtensions = undefined;
             const objects = [
-                { title: 'moshe', dataVersion: 2 },
-                { title: 'dani', dataVersion: 5 },
+                { title: 'moshe', dataVersion: '2' },
+                { title: 'dani', dataVersion: '5' },
             ];
             const resolve = async () => {
                 return objects;

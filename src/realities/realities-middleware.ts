@@ -29,9 +29,11 @@ export class RealitiesMiddleware {
             if (result === undefined || result === null) {
                 return result;
             }
-            const operationalRealityId: number = 0;
+            const operationalRealityId = '0';
             const realityId =
-                (context && context.requestHeaders && context.requestHeaders.realityId) || 0;
+                JSON.stringify(
+                    context && context.requestHeaders && context.requestHeaders.realityId,
+                ) || '0';
             const noRealityIdOrSameAsHeader = (entity: any) =>
                 entity.realityId === undefined || entity.realityId === realityId;
             const includeLinkedOperIsTrueAndEntityIsOper = (entity: any) =>
