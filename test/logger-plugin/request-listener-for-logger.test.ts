@@ -21,41 +21,28 @@ describe('RequestListenerForLoggerPlugin tests', () => {
         test('a log is written with response', async () => {
             await listener.willSendResponse(requestContext);
 
-            expect(loggerMock.info).toHaveBeenCalledWith(
-                RESPONSE_SENT,
-                context,
-                { response },
-            );
+            expect(loggerMock.info).toHaveBeenCalledWith(RESPONSE_SENT, context, { response });
         });
     });
     describe('executionDidStart tests', () => {
         test('a log is written', () => {
             listener.executionDidStart(requestContext);
 
-            expect(loggerMock.debug).toHaveBeenCalledWith(
-                EXECUTION_BEGAN,
-                context,
-            );
+            expect(loggerMock.debug).toHaveBeenCalledWith(EXECUTION_BEGAN, context);
         });
     });
     describe('parsingDidStart tests', () => {
         test('a log is written', () => {
             listener.parsingDidStart(requestContext);
 
-            expect(loggerMock.debug).toHaveBeenCalledWith(
-                PARSING_BEGAN,
-                context,
-            );
+            expect(loggerMock.debug).toHaveBeenCalledWith(PARSING_BEGAN, context);
         });
     });
     describe('validationDidStart tests', () => {
         test('a log is written', () => {
             listener.validationDidStart(requestContext);
 
-            expect(loggerMock.debug).toHaveBeenCalledWith(
-                VALIDATION_BEGAN,
-                context,
-            );
+            expect(loggerMock.debug).toHaveBeenCalledWith(VALIDATION_BEGAN, context);
         });
     });
 });

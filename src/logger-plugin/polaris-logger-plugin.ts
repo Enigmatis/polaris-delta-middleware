@@ -1,6 +1,10 @@
 import { PolarisGraphQLContext } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from 'apollo-server-plugin-base';
+import {
+    ApolloServerPlugin,
+    GraphQLRequestContext,
+    GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
 import { REQUEST_RECEIVED } from './logger-plugin-messages';
 import { PolarisRequestListener } from './polaris-request-listener';
 

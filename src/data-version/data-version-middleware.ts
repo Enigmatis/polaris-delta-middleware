@@ -1,6 +1,10 @@
 import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { DataVersion, getConnectionForReality, PolarisConnectionManager } from '@enigmatis/polaris-typeorm';
+import {
+    DataVersion,
+    getConnectionForReality,
+    PolarisConnectionManager,
+} from '@enigmatis/polaris-typeorm';
 
 export class DataVersionMiddleware {
     public readonly connectionManager?: PolarisConnectionManager;
@@ -40,21 +44,21 @@ export class DataVersionMiddleware {
                 if (Array.isArray(result)) {
                     finalResult = result.filter(entity =>
                         entity.dataVersion && context.requestHeaders.dataVersion
-                            ? entity.dataVersion > context.requestHeaders.dataVersion
+                            ? BigInt(entity.dataVersion) > context.requestHeaders.dataVersion
                             : entity,
                     );
                 } else if (
                     !(
                         (result.dataVersion &&
                             context.requestHeaders.dataVersion &&
-                            result.dataVersion > context.requestHeaders.dataVersion) ||
+                            BigInt(result.dataVersion) > context.requestHeaders.dataVersion) ||
                         !result.dataVersion
                     )
                 ) {
                     finalResult = undefined;
                 }
             }
-            if ((context.returnedExtensions?.globalDataVersion) === undefined) {
+            if (context.returnedExtensions?.globalDataVersion === undefined) {
                 await this.updateDataVersionInReturnedExtensions(context);
             }
             this.logger.debug('Data version middleware finished job', context);
@@ -63,14 +67,16 @@ export class DataVersionMiddleware {
     }
 
     public async updateDataVersionInReturnedExtensions(context: PolarisGraphQLContext) {
-        if (context?.requestHeaders?.realityId == null || !this.connectionManager?.connections?.length
+        if (
+            context?.requestHeaders?.realityId == null ||
+            !this.connectionManager?.connections?.length
         ) {
             return;
         }
         const connection = getConnectionForReality(
             context.requestHeaders.realityId,
             this.realitiesHolder,
-            this.connectionManager
+            this.connectionManager,
         );
         const dataVersionRepo = connection.getRepository(DataVersion);
         const globalDataVersion: any = await dataVersionRepo.findOne(context);

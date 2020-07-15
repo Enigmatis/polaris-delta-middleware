@@ -7,11 +7,6 @@ const irrelevantEntitiesMiddleware = new IrrelevantEntitiesMiddleware(
     connection,
 ).getMiddleware();
 
-const polarisTypeORMModule = require('@enigmatis/polaris-typeorm');
-polarisTypeORMModule.getPolarisConnectionManager = jest.fn(() => {
-    return { get: jest.fn(() => connection), connections: [connection] };
-});
-
 describe('no connection', () => {
     it('no irrelevant entities in returned extensions', async () => {
         const testContext = { returnedExtensions: {} } as any;

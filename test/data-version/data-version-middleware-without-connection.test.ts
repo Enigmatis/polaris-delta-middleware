@@ -8,17 +8,14 @@ const dvRepo: any = {
 const connection: any = { getRepository: jest.fn(() => dvRepo) };
 const logger: any = { debug: jest.fn() };
 const dataVersionMiddleware = new DataVersionMiddleware(logger, connection).getMiddleware();
-const polarisTypeORMModule = require('@enigmatis/polaris-typeorm');
-polarisTypeORMModule.getPolarisConnectionManager = jest.fn(() => {
-    return { get: jest.fn(), connections: [] };
-});
+
 describe('data version middleware', () => {
     it('no connection, extensions were not added', async () => {
         const context: any = getContextWithRequestHeaders({ dataVersion: 2 });
         context.returnedExtensions = undefined;
         const objects = [
-            { title: 'moshe', dataVersion: 2 },
-            { title: 'dani', dataVersion: 5 },
+            { title: 'moshe', dataVersion: '2' },
+            { title: 'dani', dataVersion: '5' },
         ];
         const resolve = async () => {
             return objects;

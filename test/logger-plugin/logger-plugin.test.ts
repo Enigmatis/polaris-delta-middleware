@@ -17,10 +17,7 @@ describe('LoggerPlugin tests', () => {
         test('a log is written', () => {
             loggerPlugin.requestDidStart(requestContext);
 
-            expect(loggerMock.info).toHaveBeenCalledWith(
-                REQUEST_RECEIVED,
-                context,
-            );
+            expect(loggerMock.info).toHaveBeenCalledWith(REQUEST_RECEIVED, context);
         });
     });
 });

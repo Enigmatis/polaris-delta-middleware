@@ -13,8 +13,8 @@ realitiesHolder.addReality({ id: 1, name: 'Non Real', type: 'Test' });
 realitiesHolder.addReality({ id: 2, name: 'Non Real', type: 'Test' });
 const realitiesMiddleware = new RealitiesMiddleware(logger, realitiesHolder).getMiddleware();
 describe('reality id tests', () => {
-    const operationalEntity = { title: 'Harry Potter', realityId: 0 };
-    const notOperationalEntity = { title: 'Jurassic Park', realityId: 1 };
+    const operationalEntity = { title: 'Harry Potter', realityId: '0' };
+    const notOperationalEntity = { title: 'Jurassic Park', realityId: '1' };
     const noRealityIdEntity = { title: 'Bible' };
     const entities = [operationalEntity, notOperationalEntity];
     const args = {};

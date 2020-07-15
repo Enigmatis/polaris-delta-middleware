@@ -1,6 +1,12 @@
 import { PolarisGraphQLContext, RealitiesHolder } from '@enigmatis/polaris-common';
 import { PolarisGraphQLLogger } from '@enigmatis/polaris-graphql-logger';
-import { getConnectionForReality, In, MoreThan, Not, PolarisConnectionManager } from '@enigmatis/polaris-typeorm';
+import {
+    getConnectionForReality,
+    In,
+    MoreThan,
+    Not,
+    PolarisConnectionManager,
+} from '@enigmatis/polaris-typeorm';
 export class IrrelevantEntitiesMiddleware {
     private static getTypeName(info: any): string {
         let type = info.returnType;
