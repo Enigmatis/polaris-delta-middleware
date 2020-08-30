@@ -37,6 +37,24 @@ export class IrrelevantEntitiesMiddleware {
         } as any;
     }
 
+    private static createIrrelevantWhereCriteria(result: any, context: PolarisGraphQLContext, connectionlessConfiguration?: ConnectionlessConfiguration):
+        ConnectionlessIrrelevantEntitiesCriteria | any {
+        if (connectionlessConfiguration) {
+            return {
+                realityId: context.requestHeaders.realityId,
+                notInIds: Array.isArray(result) && result.length > 0 ? result.map((x: any) => x.id) : [],
+            };
+        } else {
+            const irrelevantWhereCriteria: any =
+                Array.isArray(result) && result.length > 0
+                    ? { id: Not(In(result.map((x: any) => x.id))) }
+                    : {};
+            irrelevantWhereCriteria.deleted = In([true, false]);
+            irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
+            return irrelevantWhereCriteria;
+        }
+    }
+
     public readonly connectionLessConfiguration?: ConnectionlessConfiguration;
 
     public readonly connectionManager?: PolarisConnectionManager;
@@ -53,25 +71,6 @@ export class IrrelevantEntitiesMiddleware {
         this.logger = logger;
         this.realitiesHolder = realitiesHolder;
         this.connectionLessConfiguration = connectionLessConfiguration;
-    }
-
-    private static createIrrelevantWhereCriteria(result: any, context: PolarisGraphQLContext, connectionlessConfiguration?: ConnectionlessConfiguration):
-        ConnectionlessIrrelevantEntitiesCriteria | any {
-        if (connectionlessConfiguration) {
-            const connectionLessCriteria: ConnectionlessIrrelevantEntitiesCriteria = {
-                realityId: context.requestHeaders.realityId,
-                notInIds: Array.isArray(result) && result.length > 0 ? result.map((x: any) => x.id) : [],
-            };
-            return connectionLessCriteria;
-        } else {
-            const irrelevantWhereCriteria: any =
-                Array.isArray(result) && result.length > 0
-                    ? { id: Not(In(result.map((x: any) => x.id))) }
-                    : {};
-            irrelevantWhereCriteria.deleted = In([true, false]);
-            irrelevantWhereCriteria.realityId = context.requestHeaders.realityId;
-            return irrelevantWhereCriteria;
-        }
     }
 
     public getMiddleware() {
